@@ -12,7 +12,7 @@
     "url": "git://github.com/ivanseidel/geddy-rest.git"
   },
   "readmeFilename": "README.md",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Ivan Seidel",
   "dependencies": {
     "lodash": "^2.4.1"

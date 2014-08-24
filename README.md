@@ -38,64 +38,65 @@ It is made to be used with [GeddyJs](http://geddyjs.org/).
   Restify creates methods inside your given `controller`. It uses the `model` to _create/find/delete/update_.
   
   You can also assign some options:
-    - `opts.[create|find|update|destroy]`: [`false` | `Object`]
-      If set to false, will not generate the method.
-      
-      example:
-      ```
-      // Only enables find method
-      RESTify(this, MyModel, {
-        create: false,
-        destroy: false,
-        update: false,
-      });
-      ```
-      
-    - `opts.[create|find|update|destroy].action`: `String`
-      Use this to change the desired method to be saved. You can, for example, generate it and use it the way you want:
-      ```
-      RESTify(this, MyModel, {
-        find: {
-          action: 'myFindAction'
-        }
-      });
-      
-      this.find = function (req, res, params){
-        // Do whatever you want....
-        var a = 2*9;
-        // Delegate it to the REST find method
-        this.myFindAction(req, res, params);
+    
+  - `opts.[create|find|update|destroy]`: [`false` | `Object`]
+    If set to false, will not generate the method.
+    
+    example:
+    ```
+    // Only enables find method
+    RESTify(this, MyModel, {
+      create: false,
+      destroy: false,
+      update: false,
+    });
+    ```
+    
+  - `opts.[create|find|update|destroy].action`: `String`
+    Use this to change the desired method to be saved. You can, for example, generate it and use it the way you want:
+    ```
+    RESTify(this, MyModel, {
+      find: {
+        action: 'myFindAction'
       }
-      ```
+    });
+    
+    this.find = function (req, res, params){
+      // Do whatever you want....
+      var a = 2*9;
+      // Delegate it to the REST find method
+      this.myFindAction(req, res, params);
+    }
+    ```
+    
+    
+  - `opts.[create|find|update|destroy].beforeRender`: `function`
+    
+    Use this property to receive actions just before rendering the data. You can either render it yourself (just don't call the `next` function), or process something before rendering and delegate it to the REST action egain:
+    ```
+    this._checkDbFirst = function (err, models, next){
+      // You render the content here. Just don't call next.
+      respond(models);
       
-      
-    - `opts.[create|find|update|destroy].beforeRender`: `function`
-      
-      Use this property to receive actions just before rendering the data. You can either render it yourself (just don't call the `next` function), or process something before rendering and delegate it to the REST action egain:
-      ```
-      this._checkDbFirst = function (err, models, next){
-        // You render the content here. Just don't call next.
-        respond(models);
-        
-        // But if you do, pass the models to render
-        next(models);
+      // But if you do, pass the models to render
+      next(models);
+    }
+    
+    RESTify(this, MyModel, {
+      create: {
+        action: 'find',
+        beforeRender: this._checkDbFirst
       }
-      
-      RESTify(this, MyModel, {
-        create: {
-          action: 'find',
-          beforeRender: this._checkDbFirst
-        }
-      });
-      ```
-      
-    - GeddyJs is a well tought Framework. If you need to perform actions either `before` or `after` a call to the REST endpoint, use the methods `.before` and `.after`:
-      ```
-      // Calls prepareThings before find and create
-      this.before(prepareThings, {only: ['find', 'create']});
-      // Calls finishThingsUp after update and destroy
-      this.after(finishThingsUp, {only: ['update', 'destroy']});
-      ```
+    });
+    ```
+    
+  - GeddyJs is a well tought Framework. If you need to perform actions either `before` or `after` a call to the REST endpoint, use the methods `.before` and `.after`:
+    ```
+    // Calls prepareThings before find and create
+    this.before(prepareThings, {only: ['find', 'create']});
+    // Calls finishThingsUp after update and destroy
+    this.after(finishThingsUp, {only: ['update', 'destroy']});
+    ```
       
 - `route(Router, ModelName, opts)`
   
