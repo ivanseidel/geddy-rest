@@ -31,6 +31,60 @@ It is made to be used with [GeddyJs](http://geddyjs.org/).
   _If you want `named` paths with `GET` method, read below._
 
 
+## Nested findings
+
+Imagine the folowing situation: `User` `hasMany` `Photos`. If you need to read the User photos, you would need to go to an endpoint like `GET /photos?userId=<theUserId>`, after getting the user information in `GET /users/<theUserId>`.
+
+With that in mind, I made a simple helper that allows you to do even more with Geddy. This situation will become `GET /users/<theUserId>/photos`, in a really simple way.
+
+We present you, nested associations with REST:
+
+```
+// Add this to your config/routes.js to allow use of nested findings
+require('geddy-test').RestApi.route(router, 'users', {
+  find: {
+    // Enables Nested finding route
+    nested: true
+  }
+});
+
+// User Controller
+// We are nesting the model method 'getPhotos' as 'photos'
+require('geddy-test').RESTify(this, MyModel, {
+  find: {
+    nested: {
+      photos: 'getPhotos'
+    }
+  }
+});
+
+// You can even nest multiple actions, and provide a custom callback like:
+function specialMethod(cb){
+  // Send back data to be replaced
+  cb({custom: 'data', to: 'be', shown: true});
+}
+
+require('geddy-test').RESTify(this, MyModel, {
+  find: {
+    nested: {
+      photos: 'getPhotos',
+      friends: 'getFriends',
+      address: 'getAddress',
+      special: specialMethod
+    }
+  }
+});
+```
+
+The example above would generate the folowing routes:
+```
+GET /users/:id/photos  -> find then getPhotos
+GET /users/:id/friends -> find then getFriends
+GET /users/:id/address -> find then getAddress
+GET /users/:id/special -> find then run specialMethod
+```
+
+
 ## Advanced usage
 
 - `RESTify(controller, model, opts)`
@@ -89,6 +143,11 @@ It is made to be used with [GeddyJs](http://geddyjs.org/).
       }
     });
     ```
+    
+  - `opts.find.nested`: `Object`
+
+    Put each nested method as the key, and the callback as the value. (Read above for more info);
+
     
   - GeddyJs is a well tought Framework. If you need to perform actions either `before` or `after` a call to the REST endpoint, use the methods `.before` and `.after`:
     ```
