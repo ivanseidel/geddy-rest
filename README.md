@@ -84,6 +84,36 @@ GET /users/:id/address -> find then getAddress
 GET /users/:id/special -> find then run specialMethod
 ```
 
+## Using it as a middleware
+
+You can also use those methods for your own purpose. Look at some examples:
+
+```
+var Users = function (){
+  // Inject methods into controller
+  require('geddy-rest').RESTify(this, geddy.model.User);
+
+  // Should route to: /users/:id/resume
+  this.resume = function (req, res, params){
+
+    // Execute custom find method
+    this.find(req, res, params, function afterFind(err, model, cb){
+
+      var data = {
+        userName: model.name,
+        userFriendsCount: model.getFriends().length
+      };
+
+      // Continue with it...
+      return cb(data);
+
+      // Or render it yourself
+      respond(data);
+
+    });
+  }
+}
+```
 
 ## Advanced usage
 
